@@ -4,7 +4,7 @@ and algorithms problems!"""
 
 def max_subset(arr):
     """Return the value of the maximum subset of an array in terms of
-    product. Consider efficiency and shoot for a runtime of 0(N)."""
+    product. Consider efficiency and shoot for a linear asymptotic runtime."""
 
     max_lst = [arr[0]]
     min_lst = [arr[0]]
@@ -176,22 +176,88 @@ def num_times(x, arr):
 
 
 def gen_path(t):
-	""" Return a generator for all the paths from a root to leaf.
-	>>> tree = Tree(10, [Tree(1, [Tree(5), Tree(6, [Tree(10)])])])
-	>>> g = gen_path(t)
-	>>> next(g)
-	[10, 1, 5]
-	>>> for path in g:
-		print(path)
-	[10, 1, 6, 10]
-	[10, 10]
-	"""
-	if not t.is_leaf():
-		for paths in [gen_path(b) for b in t.branches]:
-			for path in paths:
-				yield [t.label] + path
-	else:
-		yield [t.label]
+    """ Return a generator for all the paths from a root to leaf.
+    >>> tree = Tree(10, [Tree(1, [Tree(5), Tree(6, [Tree(10)])])])
+    >>> g = gen_path(t)
+    >>> next(g)
+    [10, 1, 5]
+    >>> for path in g:
+    	print(path)
+    [10, 1, 6, 10]
+    [10, 10]
+    """
+    if not t.is_leaf():
+        for paths in [gen_path(b) for b in t.branches]:
+            for path in paths:
+                yield [t.label] + path
+    else:
+    	yield [t.label]
+
+def three_sum(nums, target_sum):
+    """ Given a list of numbers, nums, find all of the combinations of three numbers that add up
+    to target_sum. Shoot for quadratic asymptotic runtime."""
+
+    if len(nums) < 3:
+            return []
+
+    nums.sort()
+    results = set()
+
+    for i in range(len(nums) - 2):
+        j = i + 1
+        k = len(nums) - 1
+        while j < k:
+            cur = nums[i] + nums[j] + nums[k]
+            if cur > target_sum:
+                k -= 1
+            elif cur < target_sum:
+                j += 1
+            else:
+                results.add((nums[i], nums[j], nums[k]))
+                k-= 1
+                j += 1
+    return list(results)
+
+def count_change(n):
+    """Given a world in which there are coins of every power of two, going upwards in size infinitely,
+    find the number of ways one can split up a change value of size n with this currency set."""
+    ways = [0 for x in range(n+1)]
+    ways[0] = 1
+    i = 1
+    while i <= n:
+        j = i
+        while j <= n:
+            ways[j] += ways[j - i]
+            j += 1
+        i *= 2
+    return ways[n]
+
+def three_sum_closest(nums, target_sum):
+    """ Given a list of numbers, nums, find the value of the sum of any three numbers which is closest to the target_sum.
+     Shoot for quadratic asymptotic runtime. """
+    nums.sort()
+    closest = None
+
+    for i in range(len(nums) - 2):
+        j = i + 1
+        k = len(nums) - 1
+        while j < k:
+            cur = nums[i] + nums[j] + nums[k]
+            if closest is None:
+                closest = cur
+                smallest_diff = abs(cur - target_sum)
+            elif abs(cur - target_sum) < smallest_diff:
+                closest = cur
+                smallest_diff = abs(cur - target_sum)
+
+            if cur > target_sum:
+                k -= 1
+            elif cur < target_sum:
+                j += 1
+            else:
+                k-= 1
+                j += 1
+    return closest
 
 
 """Below are the implementations for the Tree & Linked list data
