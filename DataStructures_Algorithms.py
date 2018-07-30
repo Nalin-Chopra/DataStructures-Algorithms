@@ -1,6 +1,43 @@
 """ In this file, I'll code up solutions to some common & fun data structures
 and algorithms problems!"""
 
+def median_of_two_sorted_arrays(lst1, lst2):
+    """ Find the median of two individually sorted arrays as if they were merged.
+    Runtime should be proportional to log(m + n) where m and n are the sizes of the
+    two arrays."""
+    def find_kth_val(k, lst1, lst2):
+
+        if not lst1:
+            return lst2[k]
+        if not lst2:
+            return lst1[k]
+
+        mid1_index = len(lst1) // 2
+        mid2_index = len(lst2) // 2
+
+        if k > mid1_index + mid2_index:
+            # Value of k changes in recursive calls as we are removing from the front of lists
+            if lst1[mid1_index] > lst2[mid2_index]:
+                return find_kth_val(k - mid2_index - 1, lst1, lst2[mid2_index + 1:])
+            else:
+                return find_kth_val(k - mid1_index - 1, lst1[mid1_index + 1:], lst2)
+        else:
+            # Vale of k doesn't change in recursive calls as we are removing from end of lists
+            if lst1[mid1_index] > lst2[mid2_index]:
+                return find_kth_val(k, lst1[:mid1_index], lst2)
+            else:
+                return find_kth_val(k, lst1, lst2[:mid2_index])
+
+    net_length = len(lst1) + len(lst2)
+    if net_length % 2 == 1:
+        return find_kth_val(net_length // 2, lst1, lst2)
+    else:
+        # if the number of total values is even, calculate the median by
+        # taking the average of the two middle values
+        left_median = find_kth_val(net_length // 2 - 1, lst1, lst2)
+        right_median = find_kth_val(net_length // 2, lst1, lst2)
+        return (left_median + right_median) / 2
+
 
 def max_subset(arr):
     """Return the value of the maximum subset of an array in terms of
@@ -261,7 +298,8 @@ def three_sum_closest(nums, target_sum):
 
 
 """Below are the implementations for the Tree & Linked list data
-structures that I have used throughout the file."""
+structures that I have used throughout the file. Credit to UC Berkeley's CS61A
+course for developing the implementations of these data structures."""
 
 # Tree Implementation
 class Tree:
