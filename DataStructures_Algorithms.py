@@ -40,8 +40,8 @@ def median_of_two_sorted_arrays(lst1, lst2):
 
 
 def max_subset(arr):
-    """Return the value of the maximum subset of an array in terms of
-    product. Consider efficiency and shoot for a linear asymptotic runtime."""
+    """Return the value of the maximum product of a single subset of an array.
+     Consider efficiency and shoot for a linear asymptotic runtime."""
 
     max_lst = [arr[0]]
     min_lst = [arr[0]]
@@ -68,46 +68,56 @@ class Cache:
         self.head = () #Pointer to Head of Doubly Linked List
         self.tail = () ##Pointer to tail of Doubly Linked List
         self.size = 0
-        self.max_size = max_size #Max Cache Size
+        self.max_size = max(max_size, 1) #Max Cache Size is min 1
 
     def get(self, key):
         if key in self.d:
             output = self.d[key]
             if output is self.tail and self.size > 1:
-                # checks if tail pointer needs to be reassigned
+                # moves global tail attribute to second item to the end
                 self.tail = self.tail.prev
-            if output.next:
-                 # reassigns pointers in the middle of the DLL to remove recently used item
+                #reassigns new tails 'next' attribute to empty tuple
+                self.tail.next = ()
+
+            elif output.next and output.prev:
+                 # if output is in middle of DLL reassigns pointers in the middle
+                 # to remove recently used item
                 output.next.prev = output.prev
                 output.prev.next = output.next
-            else:
-                output.prev.next = ()
-            self.head.prev = output
-             # moves recently accessed item to the front of the DLL
-            output.next = self.head
-            self.head = output
-            output.prev = ()
+            if output is not self.head:
+                # moves most recently accessed item to front of DLL
+                self.head.prev = output
+                output.next = self.head
+                self.head = output
+                self.head.prev = ()
             return output.val
         else:
             return "Please enter valid key."
 
     def set(self, key, value):
         if self.size == self.max_size:
+            # delete least recently used item from cache if size is full
             old_key = self.tail.key
             del self.d[old_key]
             self.tail = self.tail.prev
-        else:
-            self.size += 1
-        new_node = Node(key, value)
-        if self.head:
-            #reassigns pointers to add the new item to the front of the Doubly linked list
-            self.head.prev = new_node
-        else:
+            stuff.size -= 1
+        if key not in self.d:
+            new_node = Node(key, value)
+            if self.head:
+                #reassigns pointers to add the new item to the front of the Doubly linked list
+                self.head.prev = new_node
+                new_node.next = self.head
+            else:
+                #initialize head and tail
+                self.head = new_node
+                self.tail = new_node
             self.head = new_node
-            self.tail = new_node
-        new_node.next = self.head
-        self.head = new_node
-        self.d[key] = new_node
+            self.d[key] = new_node
+            stuff.size += 1
+        else:
+            #replace whatever old key was with new key, move to front of DLL (reuse get method from above)
+            self.d[key].val = value
+            self.get(key)
 
 class Node:
     def __init__(self, key, value):
