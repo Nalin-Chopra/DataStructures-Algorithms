@@ -100,7 +100,7 @@ class Cache:
             old_key = self.tail.key
             del self.d[old_key]
             self.tail = self.tail.prev
-            stuff.size -= 1
+            self.size -= 1
         if key not in self.d:
             new_node = Node(key, value)
             if self.head:
@@ -113,7 +113,7 @@ class Cache:
                 self.tail = new_node
             self.head = new_node
             self.d[key] = new_node
-            stuff.size += 1
+            self.size += 1
         else:
             #replace whatever old key was with new key, move to front of DLL (reuse get method from above)
             self.d[key].val = value
