@@ -1,6 +1,148 @@
 """ In this file, I'll code up solutions to some common & fun data structures
 and algorithms problems!"""
 
+from itertools import *
+
+def closest_random_points(x_list, y_list):
+
+    def compute_dist(pt1, pt2):
+        return ((pt1[0] - pt2[0]) ** 2 + (pt1[0] + pt2[0]) ** 2) ** 0.5
+
+    min_dist = float('-inf')
+
+    for i in range(len(x_list)):
+        for j in range(len(y_list)):
+
+            if i != j:
+
+                pt1 = (x_list[i], y_list[i])
+                pt2 = (x_list[j], y_list[j])
+
+                cur_dist = compute_dist(pt1, pt2)
+                min_dist = min(min_dist, cur_dist)
+    
+    return min_dist
+
+
+
+
+
+def compute_path(x, y, index):
+    """Given a grid world coordinate goal, x,y find the lexographically index-th smallest path, where there are only two actions, 'H' or 'V' and you can
+    only move down or to the right. Assume you start from 0,0."""
+    potential_paths = []
+    chose_x = x > y
+
+    for combination in combinations(range(x + y), min(x, y)):
+
+        if chose_x:
+            net = ['H'] * (x + y)
+
+            for i in combination:
+                net[i] = 'V'
+            
+            potential_paths.append(''.join(net))
+        else:
+            net = ['V'] * (x + y)
+
+            for i in combination:
+                net[i] = 'H'
+            
+            potential_paths.append(''.join(net))
+
+    potential_paths.sort()
+
+    return potential_paths[index]
+
+
+
+
+def partition_binary_array(arr):
+    """ Partition an array of 0's and 1's into 3 parts such that the binary representation
+    of all the digits in each partition are equal.
+    Ex: arr = [0, 1, 0, 0, 1, 0, 0, 1, 0, 0] => [3, 7]
+    
+    If it cannot be split, return [-1, -1]"""
+
+    if len(arr) < 3:
+        return [-1, -1]
+
+    num_ones = arr.count(1)
+
+    if num_ones % 3 or not num_ones:
+        print("Non divisible number of 1's or no 1's.")
+        return [-1, -1]
+    
+    num_ones_each_partition = num_ones // 3
+
+    j = len(arr)
+    cur_num_ones = 0
+    required_padded_zeros = 0
+
+    while j >= 0 and cur_num_ones < num_ones_each_partition:
+        j -= 1
+        if arr[j]:
+            cur_num_ones += 1
+        elif not arr[j] and not cur_num_ones:
+            required_padded_zeros += 1
+    
+    adjusted_j = j - 1
+
+    while not arr[adjusted_j]:
+        adjusted_j -= 1
+
+    count = 0
+    adjusted_j += 1
+    while not arr[adjusted_j] and count < required_padded_zeros:
+        adjusted_j += 1
+        count += 1
+    
+    j = adjusted_j
+
+    # print("j", j)
+    # print("required_padded_zeros", required_padded_zeros)
+    # print("num ones each partition", num_ones_each_partition)
+
+    i = -1
+    cur_num_ones = 0
+
+    while i < len(arr) and cur_num_ones < num_ones_each_partition:
+        i += 1
+        if arr[i]:
+            cur_num_ones += 1
+    
+    num_padded_zeros = 0
+    while i < len(arr) and num_padded_zeros < required_padded_zeros:
+        i += 1
+        num_padded_zeros += 1
+        if arr[i]:
+            print("Not proper amount of leading zeros on left partition.")
+            return [-1, -1]
+
+    left_partition_val = compute_binary_rep(arr, 0, i)
+    middle_partition_val = compute_binary_rep(arr, i + 1, j - 1)
+    right_partition_val = compute_binary_rep(arr, j, len(arr) - 1)
+
+    if not (left_partition_val == middle_partition_val == right_partition_val):
+        print("Indices: ", i, j)
+        print("Non equal partitions: ", left_partition_val, middle_partition_val, right_partition_val)
+        return [-1, -1]
+    
+    return [i, j]
+    
+
+def compute_binary_rep(arr, start, end):
+    total = 0
+    power = 0
+
+    for i in range(end, start - 1, -1):
+
+        cur_val = arr[i]
+        total += cur_val * 2 ** power
+        power += 1
+
+    return total
+
 def median_of_two_sorted_arrays(lst1, lst2):
     """ Find the median of two individually sorted arrays as if they were merged.
     Runtime should be proportional to log(m + n) where m and n are the sizes of the
